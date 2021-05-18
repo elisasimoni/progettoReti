@@ -9,11 +9,12 @@ import sys, signal
 import http.server
 import socketserver
 import urllib.request, urllib.error, urllib.parse
+import requests
 
 #new imports
 
 
-content = "CIAO"
+content = "Autentificazione"
 
 #manage the wait witout busy waiting
 wait_refresh = threading.Event()
@@ -22,7 +23,7 @@ wait_refresh = threading.Event()
 if sys.argv[1:]:
   port = int(sys.argv[1])
 else:
-  port = 8080
+  port = 9000
 
 
 header_html = """
@@ -59,8 +60,24 @@ link_center = """
    </div>
 """.format(port=port)
 
-center_page = """ <title >Servizi Ospedalieri</title> <body> <H1 align="center">
-    """ + content +  """</H1>
+center_page = """ 
+
+<body>  
+    <center> <h1> Student Login Form </h1> </center> 
+    <form>
+        <div align="center">
+        <div class="container"> 
+            <label>Username : </label> 
+            <input type="text" placeholder="Enter Username" name="username" required>
+            <label>Password : </label> 
+            <input type="password" placeholder="Enter Password" name="password" required>
+            <button type="button"><a href="http://127.0.0.1:{port}/home.html">Login</a></button>
+            <input type="checkbox" checked="checked"> Remember me
+            Forgot password? </a> 
+        </div> 
+        </div>
+    </form>   
+
 """.format(port=port)
 
 footer_html= """
@@ -74,12 +91,18 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
        self.send_response(200)
        #Specifichiamo uno o più header
        if self.path == '/':
-            self.path = 'home.html'
+            self.path = 'autenthication.html'
        return http.server.SimpleHTTPRequestHandler.do_GET(self)
          
 # ThreadingTCPServer per consentire l'accesso a più utenti in contemporanea
 server = socketserver.ThreadingTCPServer(('127.0.0.1',port),requestHandler)
 print("Server running on port %s" % port)       
+
+def autenthication_page():
+    f = open("autenthication.html",'w', encoding="utf-8")  
+    message = header_html+center_page+footer_html
+    f.write(message)
+    f.close()
 
 def home_page():
     f = open("home.html",'w', encoding="utf-8")  
@@ -89,12 +112,10 @@ def home_page():
 
 #creo una funzione per creare le pagine dei vari servizi
 def service_page(name, url):
-    response = urllib.request.urlopen(url)
-    webContent = response.read()
-    f = open(name + ".html",'w', encoding="utf-8")  
-    f.write(bytes(webContent, 'utf-8'))
+    resp = requests.get(url)
+    f = open(name + ".html",'w', encoding="utf-8")
+    f.write(resp.text)
     f.close()
-
    
 def cardiologia_page():
     service_page("cardiologia","https://www.auslromagna.it/organizzazione/dipartimenti/cardiovascolare/cardiologia-forli")
@@ -117,10 +138,11 @@ def medicina_sport_page():
 def oncologia_page():
     service_page("oncologia","https://www.auslromagna.it/organizzazione/dipartimenti/oncoematologico/prevenzione-oncologia-forli")
 def dermatologia_page():
-    service_page("anestesia","https://www.auslromagna.it/organizzazione/dipartimenti/chirurgico-grandi-traumi-cesena/centro-grandi-ustionati-dermatologia-cesena-forli/dermatologia-forli")
+    service_page("dermatologia","https://www.auslromagna.it/organizzazione/dipartimenti/chirurgico-grandi-traumi-cesena/centro-grandi-ustionati-dermatologia-cesena-forli/dermatologia-forli")
 
 #carico le pagine 
 def load_page():
+    autenthication_page()
     home_page()
     cardiologia_page()
     neurologia_page()
@@ -162,14 +184,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-  
-   
-  
-   
 
-
-    
-    
-    
-    
-    
