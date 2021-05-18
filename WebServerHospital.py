@@ -13,19 +13,8 @@ import requests
 from bs4 import BeautifulSoup
 #new imports
 
-#pagine 
-corpo = """
-<html>
-    <head> </head>
-    <body>
 
-"""
-fondo = """
-
-      </body>
-    </html>
-"""
-
+content = "CIAO"
 
 #manage the wait witout busy waiting
 wait_refresh = threading.Event()
@@ -52,13 +41,14 @@ link_center = """
     <div align="center">
        <p>
             
+            <a href="http://127.0.0.1:{port}">Home</a>
   		    <a href="http://127.0.0.1:{port}/rianimazione.html">Rianimazione</a>
             <a href="http://127.0.0.1:{port}/ortopedia.html">Ortopedia</a>
             <a href="http://127.0.0.1:{port}/ginecologia.html">Ginecologia</a>
             <a href="http://127.0.0.1:{port}/cardiologia.html">Cardiologia</a>
             <a href="http://127.0.0.1:{port}/otorino.html">Otorinolarigoiatria</a>
             <a href="http://127.0.0.1:{port}/neurologia.html">Neurologia</a>
-            <a href="http://127.0.0.1:{port}/oculista.html">Oculsita</a>
+            <a href="http://127.0.0.1:{port}/oculista.html">Oculista</a>
             <a href="http://127.0.0.1:{port}/dermatologia.html">Dermatologia</a>
             <a href="http://127.0.0.1:{port}/oncologia.html">Oncologia</a>
             <a href="http://127.0.0.1:{port}/medicina_sport">Medicina dello sport</a>
@@ -68,6 +58,9 @@ link_center = """
   		</p>
    </div>
 """.format(port=port)
+
+center_page = """ <title >Servizi Ospedalieri</title> <body> <H1 align="center">
+    """ + content +  """</H1>""".format(port=port)
 
 footer_html= """
     </body>
@@ -90,23 +83,31 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
 # ThreadingTCPServer per consentire l'accesso a più utenti in contemporanea
 server = socketserver.ThreadingTCPServer(('127.0.0.1',port),requestHandler)
 print("Server running on port %s" % port)       
-#def index_page():
- #   f = open('index.html','w', encoding="utf-8")
-  #  try:
-   #      message = header_html+link_center+footer_html
-    #except:
-     #   pass
-    #f.write(message)
-    #f.close()
+
 
 #creo una funzione per creare le pagine dei vari servizi
 def service_page(name, url):
-    f = open(name + ".hmtl",'w', encoding="utf-8")  
-    message = "ciao"
+    f = open(name + ".html",'w', encoding="utf-8")  
+    try:
+         message = header_html+center_page+footer_html
+    except:
+        pass
     f.write(message)
     f.close()
-   
-    
+
+#carico le pagine 
+def load_page():
+    cardiologia_page()
+    neurologia_page()
+    otorino_page()
+    oculista_page()
+    nefrologia_page()
+    ginecologia_page()
+    ortopedia_page()
+    rianimazione_page()
+    medicina_sport_page()
+    oncologia_page()
+    dermatologia_page()    
 
 
         
@@ -145,6 +146,7 @@ def signal_handler(signal, frame):
       sys.exit(0)
 def main():
    
+    load_page()
     #L’interruzione da tastiera (o da console) dell’esecuzione
     #del web server deve essere opportunamente gestita in
     #modo da liberare la risorsa socket.
