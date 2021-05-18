@@ -5,12 +5,11 @@ Spyder Editor
 This is a temporary script file.
 """
 import threading
-import urllib.request
 import sys, signal
 import http.server
 import socketserver
-import requests
-from bs4 import BeautifulSoup
+import urllib.request, urllib.error, urllib.parse
+
 #new imports
 
 
@@ -24,7 +23,8 @@ if sys.argv[1:]:
   port = int(sys.argv[1])
 else:
   port = 8080
-  
+
+
 header_html = """
 <html>
     <head>
@@ -89,9 +89,10 @@ def home_page():
 
 #creo una funzione per creare le pagine dei vari servizi
 def service_page(name, url):
+    response = urllib.request.urlopen(url)
+    webContent = response.read()
     f = open(name + ".html",'w', encoding="utf-8")  
-    message = header_html+center_page+footer_html
-    f.write(message)
+    f.write(bytes(webContent, 'utf-8'))
     f.close()
 
    
