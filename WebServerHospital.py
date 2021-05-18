@@ -42,7 +42,7 @@ link_center = """
        <p>
             
             <a href="http://127.0.0.1:{port}">Home</a>
-  		    <a href="http://127.0.0.1:{port}/rianimazione.html">Rianimazione</a>
+  		       <a href="http://127.0.0.1:{port}/rianimazione.html">Rianimazione</a>
             <a href="http://127.0.0.1:{port}/ortopedia.html">Ortopedia</a>
             <a href="http://127.0.0.1:{port}/ginecologia.html">Ginecologia</a>
             <a href="http://127.0.0.1:{port}/cardiologia.html">Cardiologia</a>
@@ -72,19 +72,20 @@ footer_html= """
 class requestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
        self.send_response(200)
-       # Specifichiamo uno o più header
-       self.send_header('Content-type','text/html')
-       self.end_headers() 
-       message = header_html+link_center+footer_html
-       self.wfile.write(bytes(message, "utf8"))
-       return
-       
-        
+       #Specifichiamo uno o più header
+       if self.path == '/':
+            self.path = 'home.html'
+       return http.server.SimpleHTTPRequestHandler.do_GET(self)
          
 # ThreadingTCPServer per consentire l'accesso a più utenti in contemporanea
 server = socketserver.ThreadingTCPServer(('127.0.0.1',port),requestHandler)
 print("Server running on port %s" % port)       
 
+def home_page():
+    f = open("home.html",'w', encoding="utf-8")  
+    message = header_html+link_center+footer_html
+    f.write(message)
+    f.close()
 
 #creo una funzione per creare le pagine dei vari servizi
 def service_page(name, url):
@@ -119,6 +120,7 @@ def dermatologia_page():
 
 #carico le pagine 
 def load_page():
+    home_page()
     cardiologia_page()
     neurologia_page()
     otorino_page()
