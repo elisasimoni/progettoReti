@@ -51,7 +51,7 @@ link_center = """
             <a href="http://127.0.0.1:{port}/oculista.html">Oculista</a>
             <a href="http://127.0.0.1:{port}/dermatologia.html">Dermatologia</a>
             <a href="http://127.0.0.1:{port}/oncologia.html">Oncologia</a>
-            <a href="http://127.0.0.1:{port}/medicina_sport">Medicina dello sport</a>
+            <a href="http://127.0.0.1:{port}/medicina_sport.html">Medicina dello sport</a>
             <a href="http://127.0.0.1:{port}/nefrologia.html">Nefrologia</a>
   		    
             <a href="http://127.0.0.1:{port}/lista_servizi.pdf" download="lista_servizi.pdf">Download lista servizi</a>
@@ -60,7 +60,8 @@ link_center = """
 """.format(port=port)
 
 center_page = """ <title >Servizi Ospedalieri</title> <body> <H1 align="center">
-    """ + content +  """</H1>""".format(port=port)
+    """ + content +  """</H1>
+""".format(port=port)
 
 footer_html= """
     </body>
@@ -88,29 +89,11 @@ print("Server running on port %s" % port)
 #creo una funzione per creare le pagine dei vari servizi
 def service_page(name, url):
     f = open(name + ".html",'w', encoding="utf-8")  
-    try:
-         message = header_html+center_page+footer_html
-    except:
-        pass
+    message = header_html+center_page+footer_html
     f.write(message)
     f.close()
 
-#carico le pagine 
-def load_page():
-    cardiologia_page()
-    neurologia_page()
-    otorino_page()
-    oculista_page()
-    nefrologia_page()
-    ginecologia_page()
-    ortopedia_page()
-    rianimazione_page()
-    medicina_sport_page()
-    oncologia_page()
-    dermatologia_page()    
-
-
-        
+   
 def cardiologia_page():
     service_page("cardiologia","https://www.auslromagna.it/organizzazione/dipartimenti/cardiovascolare/cardiologia-forli")
 def neurologia_page():
@@ -134,6 +117,19 @@ def oncologia_page():
 def dermatologia_page():
     service_page("anestesia","https://www.auslromagna.it/organizzazione/dipartimenti/chirurgico-grandi-traumi-cesena/centro-grandi-ustionati-dermatologia-cesena-forli/dermatologia-forli")
 
+#carico le pagine 
+def load_page():
+    cardiologia_page()
+    neurologia_page()
+    otorino_page()
+    oculista_page()
+    nefrologia_page()
+    ginecologia_page()
+    ortopedia_page()
+    rianimazione_page()
+    medicina_sport_page()
+    oncologia_page()
+    dermatologia_page() 
 
 def signal_handler(signal, frame):
     print( 'Exiting http server (Ctrl+C pressed)')
