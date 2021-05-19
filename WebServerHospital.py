@@ -7,15 +7,10 @@ import threading
 import sys, signal
 import http.server
 import socketserver
-import urllib.request, urllib.error, urllib.parse
 import requests
 
-#new imports
 
-
-content = "Autentificazione"
-
-#manage the wait witout busy waiting
+#manage the wait 
 wait_refresh = threading.Event()
 
 #scelta porta
@@ -38,7 +33,7 @@ link_center = """
 <H1 align="center">
     Servizi Ospedalieri Nardini e Simoni
 </H1>
-    <div align="left" class="list">
+    <div align="center" class="list">
         <ul>
             <br>
             <li>
@@ -116,7 +111,7 @@ link_center = """
                     <p>L'otorinolaringoiatria e' la branca della medicina che si occupa di prevenzione, diagnosi e terapia sia medica sia chirurgica delle patologie del distretto testa-collo, ossia dell'orecchio (udito ed equilibrio), del naso (respirazione e apnee del sonno) e della gola</p>
                 </a>
             </li>
-            </li> <a href="http://127.0.0.1:{port}/Servizi_offerti.pdf" download="Servizi_offerti.pdf">Download lista servizi</a></li>
+            </li> <a href="http://127.0.0.1:{port}/Servizi_offerti.pdf" download="Servizi_offerti.pdf"><h3>Download lista servizi</h3></a></li>
         </ul>
         <br>
    </div>
