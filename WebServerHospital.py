@@ -8,16 +8,22 @@ import sys, signal
 import http.server
 import socketserver
 import requests
+import cgi
+from flask import request
+
+#new imports
 
 
-#manage the wait 
+#manage the wait witout busy waiting
 wait_refresh = threading.Event()
-
 #scelta porta
 if sys.argv[1:]:
   port = int(sys.argv[1])
 else:
   port = 9000
+  
+x=0
+  
 
 
 header_html = """
@@ -33,7 +39,7 @@ link_center = """
 <H1 align="center">
     Servizi Ospedalieri Nardini e Simoni
 </H1>
-    <div align="center" class="list">
+    <div align="left" class="list">
         <ul>
             <br>
             <li>
@@ -111,7 +117,7 @@ link_center = """
                     <p>L'otorinolaringoiatria e' la branca della medicina che si occupa di prevenzione, diagnosi e terapia sia medica sia chirurgica delle patologie del distretto testa-collo, ossia dell'orecchio (udito ed equilibrio), del naso (respirazione e apnee del sonno) e della gola</p>
                 </a>
             </li>
-            </li> <a href="http://127.0.0.1:{port}/Servizi_offerti.pdf" download="Servizi_offerti.pdf"><h3>Download lista servizi</h3></a></li>
+            </li> <a href="http://127.0.0.1:{port}/Servizi_offerti.pdf" download="Servizi_offerti.pdf">Download lista servizi</a></li>
         </ul>
         <br>
    </div>
@@ -186,28 +192,81 @@ login_style = """
 center_page = """ 
 <body>  
     <center> <h1> Login Form </h1> </center> 
-    <form>
-        <div align="center">
-        <div class="container"> 
-            <label>Username : </label> 
-            <input type="text" placeholder="Enter Username" name="username" required>
+    <form method="POST">
+        <h3 align="center">Login</h3>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                placeholder="Enter username"
+        />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Enter password"
+            />
+        </div>
+            <button type="submit" class="btn btn-primary" name="login" value="login">Submit</button>
             <br>
-            <label>Password : </label> 
-            <input type="password" placeholder="Enter Password" name="password" required>
-            <button type="button"><a href="http://127.0.0.1:{port}/home.html">Login</a></button>
-            <br>
-            <input type="checkbox" checked="checked"> Remember me
-            Forgot password? </a> 
+            <a href="http://127.0.0.1:{port}/registrer.html">Sign Up</a>
         </div> 
         </div>
     </form>   
 """.format(port=port)
 
+center_page2 = """ 
+<body>  
+    <form method="POST">
+        <h3 align="center">Sign Up</h3>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input
+                type="text"
+                class="form-control"
+                id="username"
+                name="username"
+                placeholder="Enter username"
+        />
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input
+                type="password"
+                class="form-control"
+                id="password"
+                name="password"
+                placeholder="Enter password"
+            />
+        </div>
+        <div class="form-group">
+            <label for="password2">Password (confirm)</label>
+            <input
+                type="password"
+                class="form-control"
+                id="password2"
+                name="password2"
+                placeholder="Confirm password"
+            />
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary" name="registrazione">Submit</button>
+    </form>  
+"""
+
+
 footer_html= """
     </body>
 </html>
 """  
-  
+
   
 class requestHandler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
@@ -216,14 +275,75 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
        if self.path == '/':
             self.path = 'autenthication.html'
        return http.server.SimpleHTTPRequestHandler.do_GET(self)
+   
+    def do_POST(self):
+        try:
+            # Salvo i vari dati inseriti
+            form = cgi.FieldStorage(    
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST'})
+            global x
+            
+            # Con getvalue prendo i dati inseriti dall'utente
+            if x == 0:
+                username = form.getvalue('username')
+                password = form.getvalue('password')
+                f=open("credential.txt","r")
+                lines = f.readlines()
+                print(len(lines))
+                print(username+"\n"+password)
+                i=0
+                while i < len(lines):
+                    print("sono entrato")
+                    if lines[i].strip() == username and lines[i+1].strip() == password:
+                        print("okkk")
+                        self.path='home.html'
+                        return http.server.SimpleHTTPRequestHandler.do_GET(self)
+                    i+=2
+                print("sono uscito")
+                print(self.path)
+                self.path='registrer.html'
+                x=1
+                return http.server.SimpleHTTPRequestHandler.do_GET(self)
+            elif x==1:
+                username=form.getvalue('username')
+                password = form.getvalue('password')
+                password2 = form.getvalue('password2')
+                if password == password2:
+                    with open("credential.txt", "a") as out:
+                        info = "\n"+username + "\n" + password
+                        out.write(info)
+                        x=0
+                        self.path='autenthication.html'
+                        return http.server.SimpleHTTPRequestHandler.do_GET(self)
+                self.path='registrer.html'
+                return http.server.SimpleHTTPRequestHandler.do_GET(self)
+            # Stampo all'utente i dati che ha inviato
+            self.send_response(200)
+        except: 
+            self.send_error(404, 'Bad request submitted.')
+            return;
+        
+        self.end_headers()
+        
+        # Salvo in locale i vari messaggi in AllPOST
+          
          
 # ThreadingTCPServer per consentire l'accesso a più utenti in contemporanea
 server = socketserver.ThreadingTCPServer(('127.0.0.1',port),requestHandler)
-print("Server running on port %s" % port)       
+print("Server running on port %s" % port)  
+
 
 def autenthication_page():
     f = open("autenthication.html",'w', encoding="utf-8")  
     message = header_html+login_style+center_page+footer_html
+    f.write(message)
+    f.close()
+
+def registrer_page():
+    f = open("registrer.html",'w', encoding="utf-8")  
+    message = header_html+login_style+center_page2+footer_html
     f.write(message)
     f.close()
 
@@ -267,6 +387,7 @@ def dermatologia_page():
 def load_page():
     autenthication_page()
     home_page()
+    registrer_page()
     cardiologia_page()
     neurologia_page()
     otorino_page()
@@ -289,7 +410,6 @@ def signal_handler(signal, frame):
       wait_refresh.set()
       sys.exit(0)
 def main():
-   
     load_page()
     #L’interruzione da tastiera (o da console) dell’esecuzione
     #del web server deve essere opportunamente gestita in
@@ -303,6 +423,8 @@ def main():
     except KeyboardInterrupt:
       pass
     server.server_close()
+    
+
 
 if __name__ == "__main__":
     main()
