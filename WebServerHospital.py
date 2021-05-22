@@ -312,7 +312,7 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                 password2 = form.getvalue('password2')
                 if password == password2:
                     with open("credential.txt", "a") as out:
-                        info = "\n"+username + "\n" + password
+                        info = username + "\n" + password +"\n"
                         out.write(info)
                         x=0
                         self.path='autenthication.html'
