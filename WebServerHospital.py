@@ -219,7 +219,7 @@ center_page = """
         </div>
      </div>
     </form>   
-""".format(port=port)
+"""
 
 center_page2 = """ 
 <body>  
@@ -294,7 +294,7 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                 lines = f.readlines()
                 print(self)
                 print(username+"\n"+password)
-                i=0
+                i=1
                 while i < len(lines):
                     print("sono entrato")
                     if lines[i].strip() == username and lines[i+1].strip() == password:
