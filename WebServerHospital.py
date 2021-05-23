@@ -215,7 +215,6 @@ center_page = """
         </div>
             <button type="submit" class="btn btn-primary" name="login" value="login">Submit</button>
             <br>
-            <a href="http://127.0.0.1:{port}/registrer.html">Sign Up</a>
         </div> 
         </div>
      </div>
@@ -293,7 +292,7 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                 password = form.getvalue('password')
                 f=open("credential.txt","r")
                 lines = f.readlines()
-                print(len(lines))
+                print(self)
                 print(username+"\n"+password)
                 i=0
                 while i < len(lines):
@@ -312,7 +311,8 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                 username=form.getvalue('username')
                 password = form.getvalue('password')
                 password2 = form.getvalue('password2')
-                if password == password2:
+                print(self)
+                if password == password2 and len(username) != 0 and len(password) != 0:
                     with open("credential.txt", "a") as out:
                         info = username + "\n" + password +"\n"
                         out.write(info)
