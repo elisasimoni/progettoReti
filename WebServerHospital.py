@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
-This is a temporary script file.
+    Elaborato Programmazione di Reti
+            a.a. 2020/2021
+      Michele Nardini e Elisa Simoni
+              Traccia 2
+     Web Server servizi ospedalieri
 """
-import threading
 import sys, signal
 import http.server
 import socketserver
 import requests
 import cgi
-from flask import request
-
-#new imports
 
 
-#manage the wait witout busy waiting
-wait_refresh = threading.Event()
+
 #scelta porta
 if sys.argv[1:]:
   port = int(sys.argv[1])
@@ -39,7 +37,7 @@ link_center = """
 <H1 align="center">
     Servizi Ospedalieri Nardini e Simoni
 </H1>
-    <div align="left" class="list">
+    <div align="center" class="list">
         <ul>
             <br>
             <li>
@@ -117,7 +115,7 @@ link_center = """
                     <p>L'otorinolaringoiatria e' la branca della medicina che si occupa di prevenzione, diagnosi e terapia sia medica sia chirurgica delle patologie del distretto testa-collo, ossia dell'orecchio (udito ed equilibrio), del naso (respirazione e apnee del sonno) e della gola</p>
                 </a>
             </li>
-            </li> <a href="http://127.0.0.1:{port}/Servizi_offerti.pdf" download="Servizi_offerti.pdf">Download lista servizi</a></li>
+            </li> <h1> <a href="http://127.0.0.1:{port}/Servizi_offerti.pdf" download="Servizi_offerti.pdf">Download lista servizi</a></h1></li>
         </ul>
         <br>
    </div>
@@ -191,7 +189,8 @@ login_style = """
 
 center_page = """ 
 <body>  
-    <center> <h1> Login Form </h1> </center> 
+<div align="center">
+     <h1> Login Form </h1>
     <form method="POST">
         <h3 align="center">Login</h3>
         <div class="form-group">
@@ -219,11 +218,13 @@ center_page = """
             <a href="http://127.0.0.1:{port}/registrer.html">Sign Up</a>
         </div> 
         </div>
+     </div>
     </form>   
 """.format(port=port)
 
 center_page2 = """ 
 <body>  
+    <div align="center">
     <form method="POST">
         <h3 align="center">Sign Up</h3>
         <div class="form-group">
@@ -259,6 +260,7 @@ center_page2 = """
     <br />
     <button type="submit" class="btn btn-primary" name="registrazione">Submit</button>
     </form>  
+    </div>
 """
 
 
@@ -406,8 +408,6 @@ def signal_handler(signal, frame):
       if(server):
         server.server_close()
     finally:
-      #stop refresh
-      wait_refresh.set()
       sys.exit(0)
 def main():
     load_page()
