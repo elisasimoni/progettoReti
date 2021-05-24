@@ -14,6 +14,7 @@ import cgi
 
 
 
+
 #scelta porta
 if sys.argv[1:]:
   port = int(sys.argv[1])
@@ -318,13 +319,15 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                         out.write(info)
                         x=0
                         self.path='autenthication.html'
-                        return http.server.SimpleHTTPRequestHandler.do_GET(self)
-                self.path='registrer.html'
+                        
+                else:
+                    self.path='registrer.html'
+               
                 return http.server.SimpleHTTPRequestHandler.do_GET(self)
             # Stampo all'utente i dati che ha inviato
             self.send_response(200)
         except: 
-            self.send_error(404, 'Bad request submitted.')
+            self.send_error(404, 'Username/Password non inserite correttamente, tornare indietro') 
             return;
         
         self.end_headers()
