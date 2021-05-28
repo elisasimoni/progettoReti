@@ -18,11 +18,11 @@ import cgi
 if sys.argv[1:]:
   port = int(sys.argv[1])
 else:
-  port = 8080
+  port = 9000
   
-control=0
+x=0
   
-#Codice HTML varie pagine
+
 
 header_html = """
 <html>
@@ -30,7 +30,7 @@ header_html = """
         
        
 """
-#codice HTML per le pagine dei servizi
+
 link_center = """
 <title >Servizi Ospedalieri</title>
 <body>
@@ -186,7 +186,7 @@ login_style = """
     }
 </style>
 """
-#codice HTML pagina di login
+
 center_page = """ 
 <body>  
 <div align="center">
@@ -220,7 +220,7 @@ center_page = """
      </div>
     </form>   
 """
-#codice HTML pagina di sign-up
+
 center_page2 = """ 
 <body>  
     <div align="center">
@@ -284,17 +284,17 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
             fp=self.rfile,
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST'})
-            global control
+            global x
             
             # Con getvalue prendo i dati inseriti dall'utente
-            if control == 0:
+            if x == 0:
                 username = form.getvalue('username')
                 password = form.getvalue('password')
                 f=open("credential.txt","r")
                 lines = f.readlines()
                 print(self)
                 print(username+"\n"+password)
-                i=0
+                i=1
                 while i < len(lines):
                     print("sono entrato")
                     if lines[i].strip() == username and lines[i+1].strip() == password:
@@ -304,10 +304,10 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                     i+=2
                 print("sono uscito")
                 print(self.path)
-                self.path='register.html'
-                control=1
+                self.path='registrer.html'
+                x=1
                 return http.server.SimpleHTTPRequestHandler.do_GET(self)
-            elif control==1:
+            elif x==1:
                 username=form.getvalue('username')
                 password = form.getvalue('password')
                 password2 = form.getvalue('password2')
@@ -316,16 +316,19 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                     with open("credential.txt", "a") as out:
                         info = username + "\n" + password +"\n"
                         out.write(info)
-                        control=0
+                        x=0
                         self.path='autenthication.html'
                         return http.server.SimpleHTTPRequestHandler.do_GET(self)
-                self.path='register.html'
+                self.path='registrer.html'
                 return http.server.SimpleHTTPRequestHandler.do_GET(self)
             # Stampo all'utente i dati che ha inviato
             self.send_response(200)
         except: 
-            self.send_error(404, 'Bad request submitted.')
-            return;
+            if x == 0:
+                self.path='autenthication.html'
+            else:
+                self.path='registrer.html'
+            return http.server.SimpleHTTPRequestHandler.do_GET(self)
         
         self.end_headers()
         
@@ -343,8 +346,8 @@ def autenthication_page():
     f.write(message)
     f.close()
 
-def register_page():
-    f = open("register.html",'w', encoding="utf-8")  
+def registrer_page():
+    f = open("registrer.html",'w', encoding="utf-8")  
     message = header_html+login_style+center_page2+footer_html
     f.write(message)
     f.close()
@@ -361,7 +364,7 @@ def service_page(name, url):
     f = open(name + ".html",'w', encoding="utf-8")
     f.write(resp.text)
     f.close()
-#definizione pagine servizi con riendirizzamento a url ospedale di forlì  
+   
 def cardiologia_page():
     service_page("cardiologia","https://www.auslromagna.it/organizzazione/dipartimenti/cardiovascolare/cardiologia-forli")
 def neurologia_page():
@@ -389,7 +392,7 @@ def dermatologia_page():
 def load_page():
     autenthication_page()
     home_page()
-    register_page()
+    registrer_page()
     cardiologia_page()
     neurologia_page()
     otorino_page()
