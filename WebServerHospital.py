@@ -18,9 +18,9 @@ import cgi
 if sys.argv[1:]:
   port = int(sys.argv[1])
 else:
-  port = 9000
+  port = 8080
   
-x=0
+control=0
   
 
 
@@ -284,10 +284,10 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
             fp=self.rfile,
             headers=self.headers,
             environ={'REQUEST_METHOD':'POST'})
-            global x
+            global control
             
             # Con getvalue prendo i dati inseriti dall'utente
-            if x == 0:
+            if control == 0:
                 username = form.getvalue('username')
                 password = form.getvalue('password')
                 f=open("credential.txt","r")
@@ -304,10 +304,10 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                     i+=2
                 print("sono uscito")
                 print(self.path)
-                self.path='registrer.html'
-                x=1
+                self.path='register.html'
+                control=1
                 return http.server.SimpleHTTPRequestHandler.do_GET(self)
-            elif x==1:
+            elif control==1:
                 username=form.getvalue('username')
                 password = form.getvalue('password')
                 password2 = form.getvalue('password2')
@@ -316,18 +316,18 @@ class requestHandler(http.server.SimpleHTTPRequestHandler):
                     with open("credential.txt", "a") as out:
                         info = username + "\n" + password +"\n"
                         out.write(info)
-                        x=0
+                        control=0
                         self.path='autenthication.html'
                         return http.server.SimpleHTTPRequestHandler.do_GET(self)
-                self.path='registrer.html'
+                self.path='register.html'
                 return http.server.SimpleHTTPRequestHandler.do_GET(self)
             # Stampo all'utente i dati che ha inviato
             self.send_response(200)
         except: 
-            if x == 0:
+            if control == 0:
                 self.path='autenthication.html'
             else:
-                self.path='registrer.html'
+                self.path='register.html'
             return http.server.SimpleHTTPRequestHandler.do_GET(self)
         
         self.end_headers()
@@ -346,8 +346,8 @@ def autenthication_page():
     f.write(message)
     f.close()
 
-def registrer_page():
-    f = open("registrer.html",'w', encoding="utf-8")  
+def register_page():
+    f = open("register.html",'w', encoding="utf-8")  
     message = header_html+login_style+center_page2+footer_html
     f.write(message)
     f.close()
@@ -392,7 +392,7 @@ def dermatologia_page():
 def load_page():
     autenthication_page()
     home_page()
-    registrer_page()
+    register_page()
     cardiologia_page()
     neurologia_page()
     otorino_page()
